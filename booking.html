@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking | ZOOM Studio</title>
+    <style>
+        body { background-color: #000000; margin: 0; padding: 0; font-family: 'Arial', sans-serif; color: #ffffff; overflow-x: hidden; }
+        #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        nav { position: fixed; top: 0; width: 100%; padding: 20px 0; text-align: center; background-color: rgba(10, 10, 10, 0.8); border-bottom: 1px solid #222222; z-index: 100; backdrop-filter: blur(10px); }
+        .nav-links a { color: #ffffff; text-decoration: none; margin: 0 20px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s ease; }
+        .nav-links a:hover, .nav-links a.active { color: #ff0000; }
+        
+        /* Music Toggle Button */
+        .music-toggle { 
+            position: fixed; bottom: 30px; left: 30px; z-index: 100; font-size: 1.5rem; cursor: pointer; color: #ffffff; 
+            background: rgba(20, 20, 20, 0.7); border: 1px solid #333; border-radius: 50%; width: 50px; height: 50px; 
+            display: flex; justify-content: center; align-items: center; 
+            transition: transform 0.3s ease, text-shadow 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; 
+            user-select: none; backdrop-filter: blur(5px); 
+        }
+        .music-toggle:hover { transform: scale(1.1); text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); border-color: #ff0000; box-shadow: 0 0 15px rgba(255, 0, 0, 0.3); }
+
+        .booking-wrapper { position: relative; z-index: 10; display: flex; flex-wrap: wrap; gap: 40px; max-width: 1100px; margin: 150px auto 50px auto; padding: 0 20px; justify-content: center; align-items: stretch; }
+        .glass-panel { background: rgba(15, 15, 15, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 40px; flex: 1; min-width: 300px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease; }
+        .glass-panel:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(255, 0, 0, 0.1); border-color: rgba(255, 0, 0, 0.3); }
+        .glass-panel h2 { color: #ff0000; text-transform: uppercase; letter-spacing: 5px; margin-top: 0; margin-bottom: 30px; font-size: 1.8rem; }
+        .info-item { display: flex; align-items: flex-start; margin-bottom: 30px; padding: 15px; border-radius: 6px; background: rgba(0, 0, 0, 0.4); transition: background 0.3s ease, transform 0.3s ease; cursor: default; }
+        .info-item:hover { background: rgba(255, 0, 0, 0.1); transform: translateX(10px); }
+        .info-icon { font-size: 1.8rem; margin-right: 20px; color: #ff0000; line-height: 1; }
+        .info-text p { margin: 0; color: #cccccc; font-size: 1.1rem; line-height: 1.6; letter-spacing: 1px; }
+        .info-text p strong { display: block; color: #ffffff; margin-bottom: 5px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 2px; }
+        .form-group { margin-bottom: 30px; position: relative; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 15px 0; background-color: transparent; border: none; border-bottom: 2px solid #444; color: #fff; font-size: 1.1rem; outline: none; transition: border-color 0.3s ease; box-sizing: border-box; }
+        .form-group input::placeholder, .form-group textarea::placeholder { color: #666; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-bottom-color: #ff0000; }
+        .form-group select option { background-color: #111; color: #fff; }
+        .submit-btn { width: 100%; padding: 18px; background-color: transparent; color: #ff0000; border: 2px solid #ff0000; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 3px; font-weight: bold; cursor: pointer; position: relative; overflow: hidden; transition: color 0.3s ease; }
+        .submit-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background-color: #ff0000; transition: left 0.4s ease; z-index: -1; }
+        .submit-btn:hover { color: #000; }
+        .submit-btn:hover::before { left: 0; }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; backdrop-filter: blur(5px); }
+        .modal.show { display: flex; opacity: 1; }
+        .modal-content { background: rgba(15, 15, 15, 0.95); border: 1px solid #ff0000; border-radius: 8px; padding: 40px; text-align: center; max-width: 400px; box-shadow: 0 0 30px rgba(255,0,0,0.2); transform: scale(0.8); transition: transform 0.3s ease; }
+        .modal.show .modal-content { transform: scale(1); }
+        .modal-content h3 { color: #ff0000; margin-top: 0; text-transform: uppercase; letter-spacing: 3px; font-size: 1.8rem; }
+        .modal-content p { color: #ccc; line-height: 1.6; margin-bottom: 25px; }
+        .close-btn { background: transparent; color: #ff0000; border: 1px solid #ff0000; padding: 12px 30px; font-size: 1rem; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease; font-weight: bold;}
+        .close-btn:hover { background: #ff0000; color: #000; }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+    
+    <!-- Audio element -->
+    <audio id="bgMusic" loop src="music.mp3"></audio>
+    <div class="music-toggle" id="musicToggleBtn" title="Play/Pause Music">🔇</div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <h3>Booking Ready</h3>
+            <p>Your session request has been received. Our team will contact you shortly to confirm dates and details.</p>
+            <button class="close-btn" id="closeModal">Acknowledge</button>
+        </div>
+    </div>
+
+    <nav>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="booking.html" class="active">Booking</a>
+            <a href="portfolio.html">Portfolio</a>
+        </div>
+    </nav>
+    <div class="booking-wrapper">
+        <div class="glass-panel">
+            <h2>Studio Location</h2>
+            <div class="info-item">
+                <div class="info-icon">📍</div>
+                <div class="info-text">
+                    <p><strong>Headquarters</strong>
+                    Thamallackal, Kumarapuram,<br>
+                    Haripad, Alappuzha,<br>
+                    Kerala, India - 690548</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">📞</div>
+                <div class="info-text">
+                    <p><strong>Direct Line</strong>
+                    +91 9249884298</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">✉️</div>
+                <div class="info-text">
+                    <p><strong>Email Connect</strong>
+                    zoom0479@gmail.com</p>
+                </div>
+            </div>
+        </div>
+        <div class="glass-panel">
+            <h2>Book a Session</h2>
+            <form>
+                <div class="form-group"><input type="text" placeholder="Enter Your Name"></div>
+                <div class="form-group"><input type="email" placeholder="Enter Your Email"></div>
+                <div class="form-group">
+                    <select>
+                        <option value="" disabled selected>SELECT PROJECT TYPE</option>
+                        <option>Photography</option>
+                        <option>Video Production</option>
+                        <option>3D Rendering</option>
+                    </select>
+                </div>
+                <div class="form-group"><textarea rows="4" placeholder="Describe Your Project"></textarea></div>
+                <button type="button" class="submit-btn" id="bookDateBtn">Book a Date</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        const fov = 250;
+        let currentMultiplier = 1; let targetMultiplier = 1; let warpTimeout;
+
+        // Music Toggle Logic
+        const bgMusic = document.getElementById('bgMusic');
+        const musicToggleBtn = document.getElementById('musicToggleBtn');
+        let isMusicPlaying = false;
+        
+        musicToggleBtn.addEventListener('click', () => {
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                musicToggleBtn.innerText = '🔇';
+                musicToggleBtn.style.color = '#ffffff';
+                musicToggleBtn.style.borderColor = '#333';
+            } else {
+                bgMusic.play().catch(e => console.log("Audio play failed"));
+                musicToggleBtn.innerText = '🔊';
+                musicToggleBtn.style.color = '#ff0000';
+                musicToggleBtn.style.borderColor = '#ff0000';
+            }
+            isMusicPlaying = !isMusicPlaying;
+        });
+
+        // Modal Logic
+        const bookDateBtn = document.getElementById('bookDateBtn');
+        const modal = document.getElementById('bookingModal');
+        const closeModal = document.getElementById('closeModal');
+
+        bookDateBtn.addEventListener('click', () => {
+            modal.classList.add('show');
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.classList.remove('show');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target.closest('.glass-panel') || e.target.closest('nav') || e.target.closest('.modal-content') || e.target.closest('.music-toggle')) return;
+            targetMultiplier = 12;
+            clearTimeout(warpTimeout);
+            warpTimeout = setTimeout(() => { targetMultiplier = 1; }, 600);
+        });
+
+        let mouse = { x: null, y: null, radius: 150 };
+        window.addEventListener('mousemove', (event) => { mouse.x = event.x; mouse.y = event.y; });
+        window.addEventListener('mouseout', () => { mouse.x = undefined; mouse.y = undefined; });
+
+        function resizeCanvas() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        class Node {
+            constructor() {
+                this.x = (Math.random() - 0.5) * width * 3;
+                this.y = (Math.random() - 0.5) * height * 3;
+                this.z = Math.random() * 1000;
+                this.vz = -(Math.random() * 1.5 + 0.5);
+                this.vx = (Math.random() - 0.5) * 1.5;
+                this.vy = (Math.random() - 0.5) * 1.5;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.x2d = 0; this.y2d = 0; this.scale = 0;
+            }
+            update() {
+                this.z += this.vz * currentMultiplier; this.x += this.vx * currentMultiplier; this.y += this.vy * currentMultiplier;
+                if (this.z <= 0) { this.z = 1000; this.x = (Math.random() - 0.5) * width * 3; this.y = (Math.random() - 0.5) * height * 3; }
+                if (this.x < -width * 1.5 || this.x > width * 1.5) this.vx *= -1;
+                if (this.y < -height * 1.5 || this.y > height * 1.5) this.vy *= -1;
+                this.scale = fov / (fov + this.z);
+                this.x2d = (this.x * this.scale) + (width / 2);
+                this.y2d = (this.y * this.scale) + (height / 2);
+            }
+            draw() {
+                const r = this.size * this.scale * 2; const opacity = 1 - (this.z / 1000);
+                ctx.beginPath(); ctx.arc(this.x2d, this.y2d, Math.max(r, 0.1), 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`; ctx.fill();
+            }
+        }
+        for (let i = 0; i < 200; i++) { particles.push(new Node()); }
+        function animate() {
+            currentMultiplier += (targetMultiplier - currentMultiplier) * 0.05;
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => p.update());
+            connectNodes();
+            particles.forEach(p => p.draw());
+            requestAnimationFrame(animate);
+        }
+        function connectNodes() {
+            let opacityValue = 1;
+            for (let a = 0; a < particles.length; a++) {
+                let pA = particles[a];
+                for (let b = a; b < particles.length; b++) {
+                    let pB = particles[b];
+                    let dx = pA.x2d - pB.x2d; let dy = pA.y2d - pB.y2d;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 100) {
+                        opacityValue = 1 - (distance / 100);
+                        let depthFade = 1 - ((pA.z + pB.z) / 2000);
+                        if(depthFade < 0) depthFade = 0;
+                        ctx.strokeStyle = `rgba(150, 150, 150, ${opacityValue * depthFade * 0.4})`;
+                        ctx.lineWidth = Math.max(0.1, (pA.scale + pB.scale) / 2);
+                        ctx.beginPath(); ctx.moveTo(pA.x2d, pA.y2d); ctx.lineTo(pB.x2d, pB.y2d); ctx.stroke();
+                    }
+                }
+                if (mouse.x != null && mouse.y != null) {
+                    let dxMouse = pA.x2d - mouse.x; let dyMouse = pA.y2d - mouse.y;
+                    let distanceMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+                    if (distanceMouse < mouse.radius) {
+                        opacityValue = 1 - (distanceMouse / mouse.radius);
+                        let depthFade = 1 - (pA.z / 1000);
+                        ctx.strokeStyle = `rgba(255, 0, 0, ${opacityValue * depthFade})`;
+                        ctx.lineWidth = Math.max(0.5, pA.scale * 2);
+                        ctx.beginPath(); ctx.moveTo(pA.x2d, pA.y2d); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+                    }
+                }
+            }
+        }
+        animate();
+    </script>
+</body>
+</html>

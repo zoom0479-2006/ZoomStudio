@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | ZOOM Studio</title>
+    <style>
+        body { background-color: #000000; margin: 0; padding: 0; font-family: 'Arial', sans-serif; color: #ffffff; overflow-x: hidden; }
+        #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        nav { position: fixed; top: 0; width: 100%; padding: 20px 0; text-align: center; background-color: rgba(10, 10, 10, 0.9); border-bottom: 1px solid #222222; z-index: 100; backdrop-filter: blur(10px); }
+        .nav-links a { color: #ffffff; text-decoration: none; margin: 0 20px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s ease; }
+        .nav-links a:hover, .nav-links a.active { color: #ff0000; }
+        
+        /* Music Toggle Button */
+        .music-toggle { 
+            position: fixed; bottom: 30px; left: 30px; z-index: 100; font-size: 1.5rem; cursor: pointer; color: #ffffff; 
+            background: rgba(20, 20, 20, 0.7); border: 1px solid #333; border-radius: 50%; width: 50px; height: 50px; 
+            display: flex; justify-content: center; align-items: center; 
+            transition: transform 0.3s ease, text-shadow 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; 
+            user-select: none; backdrop-filter: blur(5px); 
+        }
+        .music-toggle:hover { transform: scale(1.1); text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); border-color: #ff0000; box-shadow: 0 0 15px rgba(255, 0, 0, 0.3); }
+
+        .page-header { position: relative; z-index: 10; margin-top: 120px; text-align: center; padding: 20px 20px; }
+        .page-header h1 { font-size: 3rem; color: #ff0000; text-transform: uppercase; letter-spacing: 10px; margin: 0; font-weight: 500; }
+        .page-header p { color: #888888; letter-spacing: 3px; text-transform: uppercase; margin-top: 10px; margin-bottom: 30px; }
+        
+        /* Portfolio Categories */
+        .portfolio-categories { position: relative; z-index: 10; display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; padding: 0 20px; }
+        .portfolio-categories button { background: rgba(0,0,0,0.5); border: 1px solid #333; color: #fff; padding: 10px 25px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease; backdrop-filter: blur(5px); }
+        .portfolio-categories button:hover, .portfolio-categories button.active { border-color: #ff0000; color: #ff0000; box-shadow: 0 0 15px rgba(255, 0, 0, 0.3); }
+
+        .gallery-container { position: relative; z-index: 10; max-width: 1200px; margin: 0 auto 50px auto; padding: 0 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .gallery-item { position: relative; overflow: hidden; border-radius: 4px; aspect-ratio: 4 / 3; cursor: pointer; background-color: #111; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .gallery-item::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; box-shadow: inset 0 0 60px 20px #000000; pointer-events: none; transition: box-shadow 0.4s ease; z-index: 1; }
+        .gallery-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.4s ease; z-index: 2; }
+        .gallery-overlay span { color: #ffffff; font-size: 1.2rem; letter-spacing: 4px; text-transform: uppercase; transform: translateY(20px); transition: transform 0.4s ease; font-weight: bold; }
+        .gallery-item:hover img { transform: scale(1.1); }
+        .gallery-item:hover::after { box-shadow: inset 0 0 0px 0px #000000; }
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
+        .gallery-item:hover .gallery-overlay span { transform: translateY(0); }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+    
+    <!-- Audio element -->
+    <audio id="bgMusic" loop src="music.mp3"></audio>
+    <div class="music-toggle" id="musicToggleBtn" title="Play/Pause Music">🔇</div>
+
+    <nav>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="booking.html">Booking</a>
+            <a href="portfolio.html" class="active">Portfolio</a>
+        </div>
+    </nav>
+    
+    <div class="page-header">
+        <h1>Collections</h1>
+        <p>Our recent digital works</p>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="portfolio-categories">
+        <button class="active">All</button>
+        <button>Wedding</button>
+        <button>Photos</button>
+        <button>Albums</button>
+        <button>Videos</button>
+    </div>
+
+    <div class="gallery-container">
+        <!-- Currently populated with placeholders; ready for future pictures -->
+        <div class="gallery-item"><img src="https://picsum.photos/600/400?random=1" alt="Gallery Image"><div class="gallery-overlay"><span>Neon Portraits</span></div></div>
+        <div class="gallery-item"><img src="https://picsum.photos/600/400?random=2" alt="Gallery Image"><div class="gallery-overlay"><span>Cyberpunk</span></div></div>
+        <div class="gallery-item"><img src="https://picsum.photos/600/400?random=3" alt="Gallery Image"><div class="gallery-overlay"><span>Automotive</span></div></div>
+        <div class="gallery-item"><img src="https://picsum.photos/600/400?random=4" alt="Gallery Image"><div class="gallery-overlay"><span>Product Stills</span></div></div>
+        <div class="gallery-item"><img src="https://picsum.photos/600/400?random=5" alt="Gallery Image"><div class="gallery-overlay"><span>Monochrome</span></div></div>
+        <div class="gallery-item"><img src="https://picsum.photos/600/400?random=6" alt="Gallery Image"><div class="gallery-overlay"><span>CGI Renders</span></div></div>
+        <div class="gallery-item"><img src="https://picsum.photos/600/400?random=7" alt="Gallery Image"><div class="gallery-overlay"><span>VFX Plates</span></div></div>
+        <div class="gallery-item"><img src="https://picsum.photos/600/400?random=8" alt="Gallery Image"><div class="gallery-overlay"><span>Virtual Sets</span></div></div>
+        <div class="gallery-item"><img src="https://picsum.photos/600/400?random=9" alt="Gallery Image"><div class="gallery-overlay"><span>Mocap Data</span></div></div>
+    </div>
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        const fov = 250;
+        let currentMultiplier = 1; let targetMultiplier = 1; let warpTimeout;
+
+        // Music Toggle Logic
+        const bgMusic = document.getElementById('bgMusic');
+        const musicToggleBtn = document.getElementById('musicToggleBtn');
+        let isMusicPlaying = false;
+        
+        musicToggleBtn.addEventListener('click', () => {
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                musicToggleBtn.innerText = '🔇';
+                musicToggleBtn.style.color = '#ffffff';
+                musicToggleBtn.style.borderColor = '#333';
+            } else {
+                bgMusic.play().catch(e => console.log("Audio play failed"));
+                musicToggleBtn.innerText = '🔊';
+                musicToggleBtn.style.color = '#ff0000';
+                musicToggleBtn.style.borderColor = '#ff0000';
+            }
+            isMusicPlaying = !isMusicPlaying;
+        });
+
+        // Simple Active State for Categories
+        const categoryBtns = document.querySelectorAll('.portfolio-categories button');
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target.closest('nav') || e.target.closest('.gallery-item') || e.target.closest('.portfolio-categories') || e.target.closest('.music-toggle')) return;
+            targetMultiplier = 12;
+            clearTimeout(warpTimeout);
+            warpTimeout = setTimeout(() => { targetMultiplier = 1; }, 600);
+        });
+
+        let mouse = { x: null, y: null, radius: 150 };
+        window.addEventListener('mousemove', (event) => { mouse.x = event.x; mouse.y = event.y; });
+        window.addEventListener('mouseout', () => { mouse.x = undefined; mouse.y = undefined; });
+
+        function resizeCanvas() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        class Node {
+            constructor() {
+                this.x = (Math.random() - 0.5) * width * 3;
+                this.y = (Math.random() - 0.5) * height * 3;
+                this.z = Math.random() * 1000;
+                this.vz = -(Math.random() * 1.5 + 0.5);
+                this.vx = (Math.random() - 0.5) * 1.5;
+                this.vy = (Math.random() - 0.5) * 1.5;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.x2d = 0; this.y2d = 0; this.scale = 0;
+            }
+            update() {
+                this.z += this.vz * currentMultiplier; this.x += this.vx * currentMultiplier; this.y += this.vy * currentMultiplier;
+                if (this.z <= 0) { this.z = 1000; this.x = (Math.random() - 0.5) * width * 3; this.y = (Math.random() - 0.5) * height * 3; }
+                if (this.x < -width * 1.5 || this.x > width * 1.5) this.vx *= -1;
+                if (this.y < -height * 1.5 || this.y > height * 1.5) this.vy *= -1;
+                this.scale = fov / (fov + this.z);
+                this.x2d = (this.x * this.scale) + (width / 2);
+                this.y2d = (this.y * this.scale) + (height / 2);
+            }
+            draw() {
+                const r = this.size * this.scale * 2; const opacity = 1 - (this.z / 1000);
+                ctx.beginPath(); ctx.arc(this.x2d, this.y2d, Math.max(r, 0.1), 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`; ctx.fill();
+            }
+        }
+        for (let i = 0; i < 200; i++) { particles.push(new Node()); }
+        function animate() {
+            currentMultiplier += (targetMultiplier - currentMultiplier) * 0.05;
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => p.update());
+            connectNodes();
+            particles.forEach(p => p.draw());
+            requestAnimationFrame(animate);
+        }
+        function connectNodes() {
+            let opacityValue = 1;
+            for (let a = 0; a < particles.length; a++) {
+                let pA = particles[a];
+                for (let b = a; b < particles.length; b++) {
+                    let pB = particles[b];
+                    let dx = pA.x2d - pB.x2d; let dy = pA.y2d - pB.y2d;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 100) {
+                        opacityValue = 1 - (distance / 100);
+                        let depthFade = 1 - ((pA.z + pB.z) / 2000);
+                        if(depthFade < 0) depthFade = 0;
+                        ctx.strokeStyle = `rgba(150, 150, 150, ${opacityValue * depthFade * 0.4})`;
+                        ctx.lineWidth = Math.max(0.1, (pA.scale + pB.scale) / 2);
+                        ctx.beginPath(); ctx.moveTo(pA.x2d, pA.y2d); ctx.lineTo(pB.x2d, pB.y2d); ctx.stroke();
+                    }
+                }
+                if (mouse.x != null && mouse.y != null) {
+                    let dxMouse = pA.x2d - mouse.x; let dyMouse = pA.y2d - mouse.y;
+                    let distanceMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+                    if (distanceMouse < mouse.radius) {
+                        opacityValue = 1 - (distanceMouse / mouse.radius);
+                        let depthFade = 1 - (pA.z / 1000);
+                        ctx.strokeStyle = `rgba(255, 0, 0, ${opacityValue * depthFade})`;
+                        ctx.lineWidth = Math.max(0.5, pA.scale * 2);
+                        ctx.beginPath(); ctx.moveTo(pA.x2d, pA.y2d); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+                    }
+                }
+            }
+        }
+        animate();
+    </script>
+</body>
+</html>
